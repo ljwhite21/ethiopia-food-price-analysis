@@ -11,6 +11,18 @@ ORDER BY year;
 --(2019 had 64 total observations, and 2020 had 401)
 --indicates a structural shift in data density
 
+# Check data for overrepresentation within regional analysis
+
+  SELECT COUNT(*) AS total_amt,
+EXTRACT(YEAR FROM date) AS year
+FROM `food-inflation-data.Ethiopian_food_prices.ETH food price table`
+WHERE commodity = 'Maize (white)'
+  AND EXTRACT(YEAR FROM date) > 2017
+GROUP BY year
+ORDER BY year;
+
+-- Observation counts are unequally distributed and displays uneven distribution biased toward Oromia
+
 # Filter regions with sufficient yearly observations and enough usable years for analysis
 WITH yearly_counts AS (
   SELECT admin1 AS region,
