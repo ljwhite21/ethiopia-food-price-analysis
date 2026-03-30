@@ -1,4 +1,4 @@
--- Count observations for each region-year and identify time-frame for reliable analysis 
+# Count observations for each region-year and identify time-frame for reliable analysis 
   SELECT COUNT(*) AS total_amt,
 EXTRACT(YEAR FROM date) AS year
 FROM `food-inflation-data.Ethiopian_food_prices.ETH food price table`
