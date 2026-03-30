@@ -7,7 +7,8 @@ WHERE commodity = 'Maize (white)'
 GROUP BY year
 ORDER BY year;
 
-### Results showed significant increase in observations from 2020-2025
+### Results showed significant increase in observations from 2020-2025 
+  (2019 had 64 total observations, and 2020 had 401)
 
 -- Filter regions with sufficient yearly observations and enough usable years for analysis
 WITH yearly_counts AS (
