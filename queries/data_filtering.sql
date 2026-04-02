@@ -22,7 +22,7 @@ FROM `food-inflation-data.Ethiopian_food_prices.ETH food price table`
 WHERE commodity = 'Maize (white)' 
   AND EXTRACT(YEAR FROM date) BETWEEN 2020 AND 2025
   AND admin1 IS NOT NULL
-GROUP BY region, commodity, year
+GROUP BY region, year
 ORDER BY observations DESC
   
 -- Observation counts are unequally distributed and displays uneven distribution biased toward Oromia
@@ -30,23 +30,24 @@ ORDER BY observations DESC
 # Filter regions with sufficient yearly observations and enough usable years for analysis
   
 WITH yearly_counts AS (
-  SELECT admin1 AS region,
-    commodity,
+  SELECT
+    admin1 AS region,
     EXTRACT(YEAR FROM date) AS year,
     COUNT(*) AS observations
   FROM `food-inflation-data.Ethiopian_food_prices.ETH food price table`
   WHERE commodity = 'Maize (white)'
+    AND date >= DATE '2020-01-01'
+    AND date < DATE '2026-01-01'
     AND admin1 IS NOT NULL
-    AND EXTRACT(YEAR FROM date) BETWEEN 2020 AND 2025
-  GROUP BY region, commodity, year
+  GROUP BY region, year
   HAVING COUNT(*) >= 15
 )
 
-SELECT region,
-  commodity,
+SELECT
+  region,
   COUNT(*) AS usable_years
 FROM yearly_counts
-GROUP BY region, commodity
+GROUP BY region
 HAVING COUNT(*) >= 5
 ORDER BY region;
 
@@ -68,4 +69,4 @@ WHERE commodity = 'Maize (white)'
     AND EXTRACT(YEAR FROM date) BETWEEN 2020 AND 2025
     AND admin1 IN ('Oromia', 'Amhara', 'Tigray', 'SNNPR', 'Somali') 
 
--- Newly created table downloaded and saved under the name "Ethiopia_filtered.csv"
+-- Query exported, downloaded and saved under the name "Ethiopia_filtered.csv"
