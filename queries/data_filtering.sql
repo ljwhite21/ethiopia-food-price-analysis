@@ -1,4 +1,5 @@
 # Count observations for each region-year and identify time-frame for reliable analysis 
+  
   SELECT COUNT(*) AS total_amt,
 EXTRACT(YEAR FROM date) AS year
 FROM `food-inflation-data.Ethiopian_food_prices.ETH food price table`
@@ -13,17 +14,21 @@ ORDER BY year;
 
 # Check data for overrepresentation within regional analysis
 
-  SELECT COUNT(*) AS total_amt,
-EXTRACT(YEAR FROM date) AS year
+ SELECT 
+  admin1 AS region,
+  COUNT(*) AS observations,
+  EXTRACT(YEAR FROM date) AS year
 FROM `food-inflation-data.Ethiopian_food_prices.ETH food price table`
-WHERE commodity = 'Maize (white)'
-  AND EXTRACT(YEAR FROM date) > 2017
-GROUP BY year
-ORDER BY year;
-
+WHERE commodity = 'Maize (white)' 
+  AND EXTRACT(YEAR FROM date) BETWEEN 2020 AND 2025
+  AND admin1 IS NOT NULL
+GROUP BY region, commodity, year
+ORDER BY observations DESC
+  
 -- Observation counts are unequally distributed and displays uneven distribution biased toward Oromia
 
 # Filter regions with sufficient yearly observations and enough usable years for analysis
+  
 WITH yearly_counts AS (
   SELECT admin1 AS region,
     commodity,
@@ -44,3 +49,23 @@ FROM yearly_counts
 GROUP BY region, commodity
 HAVING COUNT(*) >= 5
 ORDER BY region;
+
+-- Regions identified with data sufficient for analysis are Amhara, Oromia, SNNPR, Somali and Tigray. 
+
+# Create new table filtered for years and regions with sufficient data for analysis
+
+SELECT 
+  date, 
+  admin1 AS region,
+  commodity,
+  unit, 
+  pricetype,
+  currency, 
+  price,
+  usdprice
+FROM `food-inflation-data.Ethiopian_food_prices.ETH food price table` 
+WHERE commodity = 'Maize (white)'
+    AND EXTRACT(YEAR FROM date) BETWEEN 2020 AND 2025
+    AND admin1 IN ('Oromia', 'Amhara', 'Tigray', 'SNNPR', 'Somali') 
+
+-- Newly created table downloaded and saved under the name "Ethiopia_filtered.csv"
